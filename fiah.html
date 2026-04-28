@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selamat Ulang Tahun Sayang</title>
+  <meta name="description" content="Website ucapan ulang tahun romantis dengan animasi, emoji, dan musik dari CDN." />
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    :root{
+      --bg1:#120318;
+      --bg2:#2a0f2f;
+      --bg3:#5b1638;
+      --card: rgba(255,255,255,.09);
+      --border: rgba(255,255,255,.18);
+      --text:#fff7fb;
+      --muted:#ffd9e8;
+      --accent:#ff6fae;
+      --accent2:#ffb3c7;
+      --shadow: 0 20px 80px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      overflow-x:hidden;
+      background:
+        radial-gradient(circle at top, rgba(255,111,174,.28), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255,179,199,.18), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 55%, var(--bg3));
+    }
+    .stars, .hearts, .emoji-rain{position:fixed; inset:0; pointer-events:none; overflow:hidden}
+    .star{
+      position:absolute; width:2px; height:2px; border-radius:50%; background:#fff;
+      opacity:.9; filter: drop-shadow(0 0 8px rgba(255,255,255,.8)); animation: twinkle linear infinite;
+    }
+    @keyframes twinkle{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(1.7);opacity:1}}
+    .heart{
+      position:absolute; font-size:18px; opacity:.7; animation: floatUp linear infinite;
+      text-shadow:0 0 14px rgba(255,111,174,.55);
+    }
+    @keyframes floatUp{
+      0%{transform:translateY(110vh) translateX(0) scale(.8); opacity:0}
+      10%{opacity:.9}
+      100%{transform:translateY(-15vh) translateX(var(--drift)) scale(1.25); opacity:0}
+    }
+    .emoji{
+      position:absolute; top:-10vh; font-size:24px; animation: drop linear forwards; filter: drop-shadow(0 0 12px rgba(255,255,255,.2));
+    }
+    @keyframes drop{
+      to{transform:translateY(120vh) rotate(360deg); opacity:0}
+    }
+    .wrap{
+      min-height:100%; display:grid; place-items:center; padding:24px;
+    }
+    .card{
+      width:min(920px, 100%);
+      border:1px solid var(--border);
+      background:var(--card);
+      backdrop-filter: blur(16px);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:18px 22px; border-bottom:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(90deg, rgba(255,111,174,.18), rgba(255,255,255,.04));
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px; padding:10px 14px;
+      border:1px solid rgba(255,255,255,.16); border-radius:999px; background:rgba(255,255,255,.06);
+      font-size:14px; color:var(--muted);
+    }
+    .content{padding:34px 24px 28px; text-align:center}
+    h1{margin:0; font-size:clamp(2rem, 5vw, 4.8rem); line-height:1.05; letter-spacing:.3px}
+    h1 .name{color:var(--accent2); text-shadow:0 0 24px rgba(255,179,199,.5)}
+    .subtitle{margin:14px auto 0; max-width:720px; color:var(--muted); font-size:clamp(1rem, 1.7vw, 1.15rem); line-height:1.7}
+    .type{
+      margin:26px auto 18px; width:min(820px, 100%); min-height:88px; padding:18px 20px;
+      border:1px dashed rgba(255,255,255,.18); border-radius:18px; background:rgba(0,0,0,.08);
+      font-size:clamp(1rem, 2.1vw, 1.15rem); line-height:1.8; color:#fff8fb;
+    }
+    .grid{
+      display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; margin:22px auto 0; width:min(820px, 100%);
+    }
+    .mini{
+      padding:16px; border-radius:18px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);
+      min-height:112px; display:flex; flex-direction:column; justify-content:center; gap:6px;
+    }
+    .mini .emoji-ic{font-size:1.4rem}
+    .mini b{font-size:1rem}
+    .mini span{color:var(--muted); font-size:.95rem; line-height:1.5}
+    .actions{display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin:24px 0 8px}
+    button, .linkbtn{
+      appearance:none; border:none; cursor:pointer; text-decoration:none; color:#fff;
+      background:linear-gradient(135deg, #ff6fae, #ff8eb6 55%, #ffb3c7);
+      box-shadow:0 12px 30px rgba(255,111,174,.25);
+      padding:14px 18px; border-radius:999px; font-weight:700; letter-spacing:.2px;
+      transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      display:inline-flex; align-items:center; gap:10px;
+    }
+    button:hover,.linkbtn:hover{transform:translateY(-2px); filter:saturate(1.05); box-shadow:0 16px 34px rgba(255,111,174,.33)}
+    button.secondary{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); box-shadow:none}
+    .footer{
+      padding:18px 22px 24px; text-align:center; color:rgba(255,247,251,.85); font-size:.92rem;
+      border-top:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.08);
+    }
+    .signature{margin-top:10px; color:var(--accent2); font-weight:700}
+    .spark{
+      position:absolute; inset:auto auto 16px 16px; width:10px; height:10px; border-radius:50%;
+      background:radial-gradient(circle, #fff, rgba(255,255,255,0)); box-shadow:0 0 30px 12px rgba(255,255,255,.08);
+      animation:pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse{50%{transform:scale(1.8); opacity:.55}}
+    .music-note{display:inline-block; animation:bounce 1s ease-in-out infinite}
+    @keyframes bounce{50%{transform:translateY(-3px)}}
+    @media (max-width: 760px){
+      .grid{grid-template-columns:1fr}
+      .content{padding:28px 18px 20px}
+      .topbar{flex-direction:column; gap:10px; align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  <div class="hearts" id="hearts"></div>
+  <div class="emoji-rain" id="emojiRain"></div>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="topbar">
+        <div class="pill">💖 Website ucapan ulang tahun</div>
+        <div class="pill"><span class="music-note">🎵</span> Sound dari CDN</div>
+      </div>
+
+      <div class="content">
+        <h1>Selamat Ulang Tahun, <span class="name" id="loveName">Sayangku</span> 💞</h1>
+        <p class="subtitle">Hari ini spesial, karena orang yang paling aku sayang sedang bertambah usia. Semoga hari ini penuh senyum, doa baik, dan cinta yang hangat.</p>
+
+        <div class="type" id="typingBox"></div>
+
+        <div class="grid">
+          <div class="mini">
+            <div class="emoji-ic">🌷</div>
+            <b>Untukmu yang paling manis</b>
+            <span>Semoga langkahmu selalu ringan dan harimu selalu dimudahkan.</span>
+          </div>
+          <div class="mini">
+            <div class="emoji-ic">✨</div>
+            <b>Doa terbaik</b>
+            <span>Sehat selalu, bahagia selalu, dan semua impian indahmu tercapai.</span>
+          </div>
+          <div class="mini">
+            <div class="emoji-ic">❤️</div>
+            <b>Dari hati yang tulus</b>
+            <span>Aku beruntung bisa mengenal dan mencintaimu setiap hari.</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="playBtn">▶ Putar Musik</button>
+          <button id="emojiBtn" class="secondary">🎉 Tebar Emoji</button>
+          <button id="confettiBtn" class="secondary">💘 Kejutan</button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>"Kamu adalah alasan senyumku hari ini, besok, dan seterusnya."</div>
+        <div class="signature">— Dari orang yang sangat sayang kamu</div>
+      </div>
+      <div class="spark"></div>
+    </section>
+  </main>
+
+  <script>
+    const nameFromQuery = new URLSearchParams(location.search).get('nama') || 'Sayangku';
+    document.getElementById('loveName').textContent = nameFromQuery;
+
+    const text = `Aku berharap hari ulang tahunmu jadi awal dari banyak hal indah.\n\nSemoga kamu selalu sehat, selalu tersenyum, dan makin bahagia. Kalau dunia lagi capek, ingat ya: ada aku yang selalu dukung kamu, selalu sayang kamu, dan selalu ingin lihat kamu bahagia.`;
+    const typingBox = document.getElementById('typingBox');
+    let idx = 0;
+    function typeWriter(){
+      if (idx <= text.length) {
+        typingBox.textContent = text.slice(0, idx).replace(/\n/g, '\n');
+        idx++;
+        setTimeout(typeWriter, 24);
+      }
+    }
+    typeWriter();
+
+    const stars = document.getElementById('stars');
+    const hearts = document.getElementById('hearts');
+    const emojiRain = document.getElementById('emojiRain');
+    const heartEmojis = ['💗','💖','💘','💕','❤️','🌹'];
+    const rainEmojis = ['🎂','🎉','✨','💞','💐','🥰','💖'];
+
+    for(let i=0;i<70;i++){
+      const s = document.createElement('span');
+      s.className='star';
+      s.style.left = Math.random()*100+'vw';
+      s.style.top = Math.random()*100+'vh';
+      s.style.animationDuration = (1.6 + Math.random()*4)+'s';
+      s.style.animationDelay = (Math.random()*3)+'s';
+      stars.appendChild(s);
+    }
+    for(let i=0;i<24;i++){
+      const h = document.createElement('span');
+      h.className='heart';
+      h.textContent = heartEmojis[i % heartEmojis.length];
+      h.style.left = Math.random()*100+'vw';
+      h.style.animationDuration = (10 + Math.random()*12)+'s';
+      h.style.animationDelay = (Math.random()*10)+'s';
+      h.style.setProperty('--drift', ((Math.random()*2-1)*120)+'px');
+      hearts.appendChild(h);
+    }
+
+    function spawnEmoji(count = 36){
+      for (let i = 0; i < count; i++) {
+        const e = document.createElement('span');
+        e.className = 'emoji';
+        e.textContent = rainEmojis[Math.floor(Math.random()*rainEmojis.length)];
+        e.style.left = Math.random()*100 + 'vw';
+        e.style.fontSize = (18 + Math.random()*22) + 'px';
+        e.style.animationDuration = (3.6 + Math.random()*2.8) + 's';
+        e.style.animationDelay = (Math.random()*0.8) + 's';
+        emojiRain.appendChild(e);
+        setTimeout(() => e.remove(), 7000);
+      }
+    }
+
+    document.getElementById('emojiBtn').addEventListener('click', () => {
+      spawnEmoji(48);
+      confetti({ particleCount: 120, spread: 75, origin: { y: 0.7 } });
+    });
+
+    document.getElementById('confettiBtn').addEventListener('click', () => {
+      confetti({ particleCount: 160, spread: 100, startVelocity: 30, origin: { y: 0.65 } });
+      spawnEmoji(60);
+    });
+
+    // Musik sederhana via Tone.js (CDN). Browser perlu interaksi klik pertama.
+    let musicStarted = false;
+    const synth = new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.02, decay: 0.12, sustain: 0.25, release: 0.6 }
+    }).toDestination();
+
+    async function playMusic(){
+      await Tone.start();
+      if (musicStarted) return;
+      musicStarted = true;
+      const notes = [
+        ['C4','8n'], ['E4','8n'], ['G4','8n'], ['C5','8n'],
+        ['B4','8n'], ['A4','8n'], ['G4','4n'],
+        ['E4','8n'], ['G4','8n'], ['A4','8n'], ['C5','8n'],
+        ['B4','8n'], ['G4','4n']
+      ];
+      let t = 0;
+      notes.forEach(([note, dur]) => {
+        synth.triggerAttackRelease(note, dur, Tone.now() + t);
+        t += 0.28;
+      });
+      // ulang pelan
+      setTimeout(() => {
+        musicStarted = false;
+      }, 6000);
+    }
+
+    document.getElementById('playBtn').addEventListener('click', async () => {
+      await playMusic();
+      spawnEmoji(22);
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.75 } });
+    });
+
+    // sapaan otomatis saat halaman dibuka
+    setTimeout(() => {
+      spawnEmoji(18);
+      confetti({ particleCount: 50, spread: 55, origin: { y: 0.72 } });
+    }, 900);
+  </script>
+</body>
+</html>
